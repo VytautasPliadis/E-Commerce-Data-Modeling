@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: raw_data_source
+    database: wix
+    schema: public
+    tables:
+      - name: raw_data
