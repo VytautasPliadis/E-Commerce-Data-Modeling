@@ -21,8 +21,6 @@ added_products AS (
         changes
     WHERE
         change_type = 'add'
-    ORDER BY
-        store_id, product_id, added_at DESC
 ),
 
 removed_products AS (
@@ -34,8 +32,6 @@ removed_products AS (
         changes
     WHERE
         change_type = 'remove'
-    ORDER BY
-        store_id, product_id, removed_at DESC
 )
 
 SELECT
@@ -57,3 +53,5 @@ LEFT JOIN
 ON
     a.store_id = r.store_id
     AND a.product_id = r.product_id
+ORDER BY
+    a.store_id, a.product_id, status
