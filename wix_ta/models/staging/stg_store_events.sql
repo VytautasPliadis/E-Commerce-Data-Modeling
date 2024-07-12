@@ -22,7 +22,7 @@ SELECT
         END
     ) AS product
 FROM
-    raw_events;
+    raw_events
 
 
 

@@ -57,4 +57,4 @@ LEFT JOIN
     removed_products r
 ON
     a.store_id = r.store_id
-    AND a.product_id = r.product_id;
+    AND a.product_id = r.product_id
