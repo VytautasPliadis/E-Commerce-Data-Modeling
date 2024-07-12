@@ -1,59 +1,60 @@
-with changes as (
-    select
+WITH changes AS (
+    SELECT
         store_id,
-        (product::json)->>'Id' as product_id,
-        (product::json)->>'name' as product_name,
-        (product::json)->'properties' as product_properties,
+        (product::json)->>'Id' AS product_id,
+        (product::json)->>'name' AS product_name,
+        (product::json)->'properties' AS product_properties,
         change_type,
         timestamp
-    from
+    FROM
         {{ ref('stg_store_events') }}
-)
-, added_products as (
-    select
-        distinct on (store_id, product_id)
+),
+
+added_products AS (
+    SELECT
+        DISTINCT ON (store_id, product_id)
         store_id,
         product_id,
         product_name,
         product_properties,
-        timestamp as added_at
-    from
+        timestamp AS added_at
+    FROM
         changes
-    where
+    WHERE
         change_type = 'add'
-    order by
-        store_id, product_id, timestamp desc
-)
+    ORDER BY
+        store_id, product_id, timestamp DESC
+),
 
-, removed_products as (
-    select
-        distinct on (store_id, product_id)
+removed_products AS (
+    SELECT
+        DISTINCT ON (store_id, product_id)
         store_id,
         product_id,
-        timestamp as removed_at
-    from
+        timestamp AS removed_at
+    FROM
         changes
-    where
+    WHERE
         change_type = 'remove'
-    order by
-        store_id, product_id, timestamp desc
+    ORDER BY
+        store_id, product_id, timestamp DESC
 )
 
-select
+SELECT
     a.store_id,
     a.product_id,
     a.added_at,
     r.removed_at,
     a.product_name,
     a.product_properties,
-    case
-        when r.removed_at is null or a.added_at > r.removed_at then 'active'
-        else 'removed'
-    end as status
-from
+    CASE
+        WHEN r.removed_at IS NULL OR a.added_at > r.removed_at THEN 'active'
+        ELSE 'removed'
+    END AS status
+FROM
     added_products a
-left join
+LEFT JOIN
     removed_products r
-on
+ON
     a.store_id = r.store_id
-    and a.product_id = r.product_id
+    AND a.product_id = r.product_id;

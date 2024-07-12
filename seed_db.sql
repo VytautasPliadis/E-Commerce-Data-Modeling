@@ -3,7 +3,7 @@ CREATE TABLE raw_data (
     user_id VARCHAR(50),
     Store_id VARCHAR(50),
     Digest JSONB
-)
+);
 
 INSERT INTO raw_data (Timestamp, user_id, Store_id, Digest) VALUES-- created empty store
 ('2024-05-25 05:24:53', 'user_001', 'store_001', '{"Date": "2024-05-01 23:54:42", "payload": {"change": "create", "products": {}}}'),

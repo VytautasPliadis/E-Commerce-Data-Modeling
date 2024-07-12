@@ -1,5 +1,5 @@
 version: 2
-
+# sample data from seed_db.sql
 sources:
   - name: raw_data_source
     database: wix
