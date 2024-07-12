@@ -5,39 +5,37 @@ WITH changes AS (
         (product::json)->>'name' AS product_name,
         (product::json)->'properties' AS product_properties,
         change_type,
-        timestamp
+        event_date
     FROM
         {{ ref('stg_store_events') }}
 ),
 
 added_products AS (
     SELECT
-        DISTINCT ON (store_id, product_id)
         store_id,
         product_id,
         product_name,
         product_properties,
-        timestamp AS added_at
+        event_date AS added_at
     FROM
         changes
     WHERE
         change_type = 'add'
     ORDER BY
-        store_id, product_id, timestamp DESC
+        store_id, product_id, added_at DESC
 ),
 
 removed_products AS (
     SELECT
-        DISTINCT ON (store_id, product_id)
         store_id,
         product_id,
-        timestamp AS removed_at
+        event_date AS removed_at
     FROM
         changes
     WHERE
         change_type = 'remove'
     ORDER BY
-        store_id, product_id, timestamp DESC
+        store_id, product_id, removed_at DESC
 )
 
 SELECT
@@ -48,13 +46,14 @@ SELECT
     a.product_name,
     a.product_properties,
     CASE
-        WHEN r.removed_at IS NULL OR a.added_at > r.removed_at THEN 'active'
+        WHEN r.removed_at IS NULL THEN 'active'
+        WHEN a.added_at > r.removed_at THEN 'active'
         ELSE 'removed'
     END AS status
 FROM
-    added_products a
+    added_products AS a
 LEFT JOIN
-    removed_products r
+    removed_products AS r
 ON
     a.store_id = r.store_id
     AND a.product_id = r.product_id
