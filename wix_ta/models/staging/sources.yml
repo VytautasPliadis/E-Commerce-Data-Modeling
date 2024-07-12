@@ -2,7 +2,44 @@ version: 2
 # sample data from seed_db.sql
 sources:
   - name: raw_data_source
+    description: "Raw data source"
     database: wix
     schema: public
     tables:
       - name: raw_data
+        columns:
+          - name: timestamp
+            tests:
+              - not_null
+          - name: user_id
+            tests:
+              - not_null
+          - name: store_id
+            tests:
+              - not_null
+          - name: digest
+            tests:
+              - not_null
+      - name: stg_store_events
+        description: "Staging model for store events"
+        columns:
+          - name: timestamp
+            tests:
+              - not_null
+          - name: user_id
+            tests:
+              - not_null
+          - name: store_id
+            tests:
+              - not_null
+          - name: event_date
+            tests:
+              - not_null
+          - name: change_type
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [ "create", "add", "update", "remove" ]
+          - name: product
+            tests:
+              - not_null

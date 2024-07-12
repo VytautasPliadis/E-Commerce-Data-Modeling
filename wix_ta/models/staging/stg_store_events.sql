@@ -1,3 +1,4 @@
+-- Extract and normalize raw events data
 WITH raw_events AS (
     SELECT
         timestamp,
@@ -9,6 +10,8 @@ WITH raw_events AS (
     FROM
         {{ source('raw_data_source', 'raw_data') }}
 )
+
+-- Normalize products into individual rows
 SELECT
     timestamp,
     user_id,
@@ -23,6 +26,5 @@ SELECT
     ) AS product
 FROM
     raw_events
-
 
 
