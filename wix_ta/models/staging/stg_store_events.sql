@@ -1,28 +1,30 @@
-with raw_events as (
-    select
+-- Extract and normalize raw events data
+WITH raw_events AS (
+    SELECT
         timestamp,
         user_id,
         store_id,
-        (digest::json)->>'Date' as event_date,
-        (digest::json)->'payload'->>'change' as change_type,
-        (digest::json)->'payload'->'products' as products
-    from
+        (digest::json)->>'Date' AS event_date,
+        (digest::json)->'payload'->>'change' AS change_type,
+        (digest::json)->'payload'->'products' AS products
+    FROM
         {{ source('raw_data_source', 'raw_data') }}
 )
 
-select
+-- Normalize products into individual rows
+SELECT
     timestamp,
     user_id,
     store_id,
     event_date,
     change_type,
     jsonb_array_elements_text(
-        case
-            when json_typeof(products::json) = 'array' then products::jsonb
-            else jsonb_build_array(products::jsonb)
-        end
-    ) as product
-from
+        CASE
+            WHEN json_typeof(products::json) = 'array' THEN products::jsonb
+            ELSE jsonb_build_array(products::jsonb)
+        END
+    ) AS product
+FROM
     raw_events
 
 
