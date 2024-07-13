@@ -12,7 +12,7 @@ INSERT INTO raw_data (Timestamp, user_id, Store_id, Digest) VALUES
 ('2024-05-25 10:56:03', 'user_003', 'store_003', '{"Date": "2024-05-05 16:37:26", "payload": {"change": "create", "products": {}}}'),
 ('2024-05-25 14:11:05', 'user_003', 'store_004', '{"Date": "2024-05-11 21:18:18", "payload": {"change": "create", "products": {}}}'),
 ('2024-05-25 15:21:32', 'user_004', 'store_005', '{"Date": "2024-05-15 06:16:00", "payload": {"change": "create", "products": {}}}'),
--- added products
+
 ('2024-05-25 22:19:37', 'user_001', 'store_001', '{"Date": "2024-05-16 21:09:16", "payload": {"change": "add", "products": [{"Id": "100", "name": "T Shirt", "properties": {"size": "M", "color": "white"}}]}}'),
 ('2024-05-25 06:31:52', 'user_002', 'store_002', '{"Date": "2024-05-16 01:13:54", "payload": {"change": "add", "products": [{"Id": "100", "name": "T Shirt", "properties": {"size": "L", "color": "blue"}}]}}'),
 ('2024-05-25 12:53:11', 'user_003', 'store_003', '{"Date": "2024-05-16 20:50:30", "payload": {"change": "add", "products": [{"Id": "100", "name": "T Shirt", "properties": {"size": "S", "color": "red"}}]}}'),
