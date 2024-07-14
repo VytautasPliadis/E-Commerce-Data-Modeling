@@ -1,5 +1,5 @@
 version: 2
-# sample data from seed_db.sql
+
 sources:
   - name: raw_data_source
     description: "Raw data source"
@@ -9,14 +9,14 @@ sources:
       - name: raw_data
         columns:
           - name: timestamp
-            tests:
+            data_tests:
               - not_null
           - name: user_id
-            tests:
+            data_tests:
               - not_null
           - name: store_id
-            tests:
+            data_tests:
               - not_null
           - name: digest
-            tests:
+            data_tests:
               - not_null
