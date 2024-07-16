@@ -2,7 +2,7 @@
 name = "wix-ta"
 version = "0.1.0"
 description = ""
-authors = ["VytautasPliadis <vytautas.pliadis@gmail.com>"]
+authors = ["Vytautas Pliadis <vytautas.pliadis@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
