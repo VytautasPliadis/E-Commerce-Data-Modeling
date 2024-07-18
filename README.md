@@ -58,7 +58,7 @@
 
 To create a flexible infrastructure for generating fast reports, we need to define several processes and tables. 
   
-#### 1. Transform  
+### 1. Transform  
   
 - **Staging Tables**: Intermediate tables that hold raw but normalized data.  
     - **`stg_store_events`**: Normalize raw events data.  
@@ -85,7 +85,7 @@ To create a flexible infrastructure for generating fast reports, we need to defi
     - **`fct_user_store_actions`**: Fact table for user actions.  
       - Log user actions in stores with associated timestamps.  
 
-#### 2. Reporting and Analysis  
+### 2. Reporting and Analysis  
   
 - **Mart Tables**: Aggregated data for specific reporting needs.  
     - **`store_current_status`**: Generate current status reports.  
