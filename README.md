@@ -45,51 +45,47 @@
 ├── pyproject.toml
 └── README.md
 ```
-## Input And Data Assumptions  
 
+## Data Assumptions  
+
+- The data is **extracted** and **loaded** into the database table (this part is outside the scope of this project).
 - Each change to a store's state is stored in the database as a JSON object in the `digest` column of the `raw_data` table.
-- The `product_id` may not be unique, so a composite primary key must be used in the product dimension table.
+- The `product_id` may not be unique (multiple stores could use same product id), so a composite primary key must be used in the product dimension table.
 - The `timestamp` in the data model may not be unique due to multiple products being added in one JSON file, so a surrogate key must be implemented in the fact table.
-- There are only `add`, `remove`, and `create` actions in the JSON sample. I added the `update` action to increase project complexity.
+- There are only `add`, `remove`, and `create` actions in the sample data. `update` action is added to increase project complexity.
+
 ## Processes and Tables for Flexible Reporting Infrastructure  
 
 To create a flexible infrastructure for generating fast reports, we need to define several processes and tables. 
   
-#### 1. Extract and Load  
-  
-- **Source Table**: `raw_data`  
-    - **Columns**: `timestamp`, `user_id`, `store_id`, `digest`  
-    - **Purpose**: Store all raw events data in JSON format.  
-- **Process**:  
-  - Extract JSON data from the `digest` column.  
-  - Load the extracted data into staging tables for normalization.  
-  
-#### 2. Transform  
+#### 1. Transform  
   
 - **Staging Tables**: Intermediate tables that hold raw but normalized data.  
     - **`stg_store_events`**: Normalize raw events data.  
-      - Extract fields from JSON.  
-      - Normalize products into individual rows.  
-    - **`stg_products`**: Extract product details from the events.  
+      - Parse fields from JSON, splitting a single JSON object into multiple rows based on individual product information.  
+    - **`stg_products`**: Filter events from `stg_store_events` witch are related only to products.  
+  
 - **Intermediate Tables**: Aggregated and calculated data.  
     - **`int_store_current_status`**: Current status of stores.  
       - Aggregate active product quantities per store.  
     - **`int_store_point_in_time_status`**: Status of stores at specific points in time.  
       - Aggregate product quantities at specific timestamps.  
     - **`int_product_parameter_changes`**: Track parameter changes over time.  
-      - Identify and log changes in product attributes.  
+      - Identify and log changes in product attributes.
+      
 - **Warehouse Tables**: Fact and dimension tables for analytics.  
     - **`dim_date`**: Date dimension table.  
       - Store calendar dates with attributes (year, month, day, quarter).  
     - **`dim_product`**: Product dimension table.  
       - Store product details and attributes.  
     - **`dim_store`**: Store dimension table.  
-      - Store store details.  
+      - Store details.  
     - **`dim_user`**: User dimension table.  
-      - Store user details.  
+      - User details.  
     - **`fct_user_store_actions`**: Fact table for user actions.  
       - Log user actions in stores with associated timestamps.  
-#### 3. Reporting and Analysis  
+
+#### 2. Reporting and Analysis  
   
 - **Mart Tables**: Aggregated data for specific reporting needs.  
     - **`store_current_status`**: Generate current status reports.  
@@ -99,8 +95,9 @@ To create a flexible infrastructure for generating fast reports, we need to defi
 ## Processes Sensitive to Scale and Production Changes  
   
 - **Data Volume**: As data grows, indexing and partitioning strategies should be implemented to optimize query performance.  
-- **Schema Changes**: Ensure backward compatibility and maintain version control for schema changes.  
+- **Schema Changes**: Maintain version control for schema changes.  
 - **Data Quality**: Implement data validation and testing to ensure data integrity.  
+
 ### Organizational Advancement
 
 - **Collaboration**: Foster collaboration between data engineers, analysts, and PMs.
@@ -108,7 +105,7 @@ To create a flexible infrastructure for generating fast reports, we need to defi
     - Shared documentation and knowledge base.
 - **Documentation**: Maintain comprehensive documentation for the project.
     - Detailed descriptions of processes and tables.
-    - Usage guidelines and best practices.
+
 ## Stakeholders and Process  
 
 - **Product Managers (PMs)**: Require reports for decision-making.  
@@ -131,11 +128,19 @@ To create a flexible infrastructure for generating fast reports, we need to defi
 ![erd.png](img%2Ferd.png)
 
 ### Macro
+The `generate_store_status` macro processes events to determine the current status of products in stores. It goes through the following steps:
+
+1. Extracts relevant product change events from the `stg_store_events` table.
+2. Ranks changes to identify the most recent updates.
+3. Determines the latest add, update, and remove timestamps for each product.
+4. Compiles the final product status, resolving properties based on the latest changes.
+5. Outputs a report showing each product's current status and details.
+
 ```sql
 -- macro/store_status.sql
 
 {% macro generate_store_status(execution_date_condition) %}  
-    -- Define the changes CTE  
+    -- CTE to define the changes
     WITH changes AS (  
         SELECT  
             store_id,  
@@ -210,10 +215,3 @@ To create a flexible infrastructure for generating fast reports, we need to defi
         lpc.store_id, status ASC  
 {% endmacro %}
 ```
-The `generate_store_status` macro processes events to determine the current status of products in stores. It goes through the following steps:
-
-1. Extracts relevant product change events from the `stg_store_events` table.
-2. Ranks changes to identify the most recent updates.
-3. Determines the latest add, update, and remove timestamps for each product.
-4. Compiles the final product status, resolving properties based on the latest changes.
-5. Outputs a report showing each product's current status and details.

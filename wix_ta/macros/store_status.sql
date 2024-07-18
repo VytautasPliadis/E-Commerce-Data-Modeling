@@ -1,5 +1,5 @@
 {% macro generate_store_status(execution_date_condition) %}
-    -- Define the changes CTE
+    -- CTE to define the changes
     WITH changes AS (
         SELECT
             store_id,
